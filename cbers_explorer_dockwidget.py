@@ -29,7 +29,6 @@ from qgis.PyQt.QtCore import pyqtSignal
 from PyQt5 import QtWidgets
 from PyQt5.QtCore import QCoreApplication, QTranslator, QDate
 from PyQt5.QtWidgets import QVBoxLayout, QLabel, QPushButton, QHBoxLayout, QDateEdit, QTableWidget, QTableWidgetItem, QHeaderView, QMessageBox
-from qgis.PyQt import QtWidgets
 from qgis.core import QgsCoordinateReferenceSystem, QgsCoordinateTransform, QgsProject, QgsRasterLayer
 from qgis.utils import iface
 from osgeo import gdal
@@ -91,11 +90,12 @@ class CbersExplorerDockWidget(QtWidgets.QDockWidget, FORM_CLASS):
         self.layout.addWidget(self.result_label)
         
         self.table_widget = QTableWidget()
-        self.table_widget.setColumnCount(3)
+        self.table_widget.setColumnCount(4)
         self.table_widget.setHorizontalHeaderLabels([
             self.tr("ID da Imagem"),
             self.tr("Data de Criação"),
-            self.tr("Data de Alteração")
+            self.tr("Data de Alteração"),
+            self.tr("Copiar URL")
         ])
         self.table_widget.horizontalHeader().setSectionResizeMode(QHeaderView.Stretch)
         self.table_widget.cellClicked.connect(self.load_selected_image)  # Connect cell click to load image
@@ -179,6 +179,10 @@ class CbersExplorerDockWidget(QtWidgets.QDockWidget, FORM_CLASS):
             self.table_widget.setItem(row_position, 1, QTableWidgetItem(feature['properties']['created']))
             self.table_widget.setItem(row_position, 2, QTableWidgetItem(feature['properties']['updated']))
 
+            copy_button = QPushButton(self.tr("Copiar URL"))
+            copy_button.clicked.connect(lambda _, f=feature: self.copy_to_clipboard(f['assets']['tci']['href']))
+            self.table_widget.setCellWidget(row_position, 3, copy_button)
+
     def load_selected_image(self, row, column):
         selected_id = self.table_widget.item(row, 0).text()
         for feature in self.features:
@@ -206,6 +210,11 @@ class CbersExplorerDockWidget(QtWidgets.QDockWidget, FORM_CLASS):
         layer = self.build_and_load_vrt(urls, id)
         if layer is None:
             QMessageBox.critical(None, self.tr('Erro'), self.tr('Falha ao carregar a imagem no mapa.'))
+
+    def copy_to_clipboard(self, text):
+        clipboard = QCoreApplication.instance().clipboard()
+        clipboard.setText(text)
+        QMessageBox.information(self, self.tr("Informação"), self.tr("URL copiada para a área de transferência."))
     
     def closeEvent(self, event):
         self.closingPlugin.emit()
