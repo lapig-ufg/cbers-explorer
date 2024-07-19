@@ -35,13 +35,3 @@ For any issues or feature requests, please use the [issue tracker](https://githu
 ## License
 
 This project is licensed under the MIT License. See the [LICENSE](LICENSE) file for details.
-
-## Contributing
-
-Contributions are welcome! Please read the [contributing guidelines](CONTRIBUTING.md) for more details.
-
-## Changelog
-
-Uncomment the following line and add your changelog if needed:
-```markdown
-# changelog
