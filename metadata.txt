@@ -1,47 +1,37 @@
-# This file contains metadata for your plugin.
-
-# This file should be included when you package your plugin.# Mandatory items:
-
 [general]
-name=CBERS-4A WPM Explorer
-qgisMinimumVersion=3.0
-description=The CBERS Explorer is a specialized plugin developed to facilitate the search and retrieval of images from the China-Brazil Earth Resources Satellite (CBERS) program, specifically focusing on the CBERS-4A satellite with Wide Field Imager (WPM) data.
-version=1.0
+name=CBERS Explorer
+qgisMinimumVersion=3.22
+description=Search and retrieve CBERS-4A satellite imagery from Brazil Data Cube STAC catalog. Supports COG visualization, downloads, and multiple collections.
+version=2.0.0
 author=Tharles de Sousa Andrade | LAPIG
 email=irtharles@gmail.com
 
-about=The CBERS Explorer is a specialized plugin developed to facilitate the search and retrieval of images from the China-Brazil Earth Resources Satellite (CBERS) program, specifically focusing on the CBERS-4A satellite with Wide Field Imager (WPM) data. This plugin is particularly useful for researchers, scientists, and analysts who require high-resolution imagery for various applications such as environmental monitoring, urban planning, and agricultural analysis. This collection contains 2-meter high-resolution RGB products, generated using the Principal Components Fusion (PCA).
+about=CBERS Explorer is a QGIS plugin for searching and loading CBERS-4A satellite imagery from the Brazil Data Cube (BDC) STAC catalog. Features include quick and advanced search modes, paginated results, COG layer loading via /vsicurl/, asset downloads with progress tracking, and support for multiple CBERS collections. Version 2.0.0 introduces a complete architectural redesign with layered architecture, reactive state management, and professional UX.
 
 tracker=https://github.com/lapig-ufg/cbers-explorer/issues
 repository=https://github.com/lapig-ufg/cbers-explorer
-# End of mandatory metadata
-
-# Recommended items:
 
 hasProcessingProvider=no
-# Uncomment the following line and add your changelog:
-# changelog=
 
-# Tags are comma separated with spaces allowed
-tags=python
+changelog=
+    2.0.0 - Complete architectural redesign
+        - Layered architecture (Domain, Infra, App, UI)
+        - ActivityBar navigation with 5 panels
+        - Quick search (canvas bbox + fixed collection)
+        - Advanced search (flexible ROI, dynamic collections)
+        - Paginated results with QTableView
+        - Item details with thumbnail preview
+        - Download manager with progress tracking
+        - Native QGIS HTTP (no external requests dependency)
+        - QgsTask for non-blocking operations
+        - Reactive state via AppState signals
+    1.0 - Initial release
+
+tags=cbers,satellite,imagery,stac,remote sensing,brazil,bdc,cog
 
 homepage=https://github.com/lapig-ufg/cbers-explorer
 category=Plugins
 icon=icon.png
-# experimental flag
 experimental=False
-
-# deprecated flag (applies to the whole plugin, not just a single version)
 deprecated=False
-
-# Since QGIS 3.8, a comma separated list of plugins to be installed
-# (or upgraded) can be specified.
-# Check the documentation for more information.
-# plugin_dependencies=
-
-Category of the plugin: Raster, Vector, Database or Web
-# category=
-
-# If the plugin can run on QGIS Server.
 server=False
-
