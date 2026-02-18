@@ -12,7 +12,12 @@ from qgis.core import (
 from qgis.utils import iface
 
 from ...domain.models import SearchParams
-from ..theme import SEARCH_BUTTON_STYLESHEET, PRESET_BUTTON_STYLESHEET, SECTION_LABEL_STYLESHEET
+from ..theme import (
+    SEARCH_BUTTON_STYLESHEET, PRESET_BUTTON_STYLESHEET,
+    SECTION_LABEL_STYLESHEET, TITLE_STYLESHEET, DESC_STYLESHEET,
+    INFO_BOX_STYLESHEET,
+)
+from .collection_metadata_dialog import CollectionMetadataDialog
 
 
 class AdvancedSearchPanel(QWidget):
@@ -24,6 +29,7 @@ class AdvancedSearchPanel(QWidget):
         self._config = config_repo
         self._current_bbox = None
         self._drawn_geometry = None
+        self._collections = []
 
         self._build_ui()
         self._connect_signals()
@@ -35,11 +41,11 @@ class AdvancedSearchPanel(QWidget):
 
         # Title
         title = QLabel(self.tr("Busca Avancada"))
-        title.setStyleSheet("font-size: 14px; font-weight: bold; color: #2c3e50;")
+        title.setStyleSheet(TITLE_STYLESHEET)
         layout.addWidget(title)
 
         desc = QLabel(self.tr("ROI flexivel, colecao dinamica e filtros"))
-        desc.setStyleSheet("color: #7f8c8d; font-size: 11px;")
+        desc.setStyleSheet(DESC_STYLESHEET)
         desc.setWordWrap(True)
         layout.addWidget(desc)
 
@@ -68,9 +74,7 @@ class AdvancedSearchPanel(QWidget):
 
         self._roi_display = QLabel(self.tr("Nao definido"))
         self._roi_display.setWordWrap(True)
-        self._roi_display.setStyleSheet(
-            "background-color: #f8f9fa; padding: 6px; border-radius: 3px; font-size: 11px;"
-        )
+        self._roi_display.setStyleSheet(INFO_BOX_STYLESHEET)
         layout.addWidget(self._roi_display)
 
         # Layer selector (for "layer" mode)
@@ -118,9 +122,19 @@ class AdvancedSearchPanel(QWidget):
         col_label.setStyleSheet(SECTION_LABEL_STYLESHEET)
         layout.addWidget(col_label)
 
+        col_row = QHBoxLayout()
         self._collection_combo = QComboBox()
         self._collection_combo.setMinimumHeight(28)
-        layout.addWidget(self._collection_combo)
+        col_row.addWidget(self._collection_combo)
+
+        self._metadata_btn = QPushButton(self.tr("Info"))
+        self._metadata_btn.setStyleSheet(PRESET_BUTTON_STYLESHEET)
+        self._metadata_btn.setFixedWidth(40)
+        self._metadata_btn.setToolTip(self.tr("Ver metadados da colecao"))
+        self._metadata_btn.clicked.connect(self._on_show_metadata)
+        self._metadata_btn.setEnabled(False)
+        col_row.addWidget(self._metadata_btn)
+        layout.addLayout(col_row)
 
         # Limit
         limit_layout = QHBoxLayout()
@@ -145,11 +159,18 @@ class AdvancedSearchPanel(QWidget):
         self._state.collections_changed.connect(self._on_collections_loaded)
         self._state.loading_changed.connect(self._on_loading_changed)
 
+        # Collections may have loaded before this panel was created
+        if self._state.collections:
+            self._on_collections_loaded(self._state.collections)
+
     def _on_collections_loaded(self, collections):
+        self._collections = collections
         self._collection_combo.clear()
         for c in collections:
             display = c.title if c.title else c.id
             self._collection_combo.addItem(display, c.id)
+
+        self._metadata_btn.setEnabled(len(collections) > 0)
 
         last = self._config.get("last_collection")
         if last:
@@ -205,12 +226,13 @@ class AdvancedSearchPanel(QWidget):
             crs_src = canvas.mapSettings().destinationCrs()
             transform = QgsCoordinateTransform(crs_src, crs_dest, QgsProject.instance())
             ext = transform.transformBoundingBox(extent)
-            return [
+            bbox = [
                 round(ext.xMinimum(), 6),
                 round(ext.yMinimum(), 6),
                 round(ext.xMaximum(), 6),
                 round(ext.yMaximum(), 6),
             ]
+            return bbox if self._is_valid_wgs84_bbox(bbox) else None
         except Exception:
             return None
 
@@ -227,14 +249,25 @@ class AdvancedSearchPanel(QWidget):
             crs_src = layer.crs()
             transform = QgsCoordinateTransform(crs_src, crs_dest, QgsProject.instance())
             ext = transform.transformBoundingBox(extent)
-            return [
+            bbox = [
                 round(ext.xMinimum(), 6),
                 round(ext.yMinimum(), 6),
                 round(ext.xMaximum(), 6),
                 round(ext.yMaximum(), 6),
             ]
+            return bbox if self._is_valid_wgs84_bbox(bbox) else None
         except Exception:
             return None
+
+    @staticmethod
+    def _is_valid_wgs84_bbox(bbox):
+        if not bbox or len(bbox) != 4:
+            return False
+        west, south, east, north = bbox
+        return (
+            abs(west) <= 180 and abs(east) <= 180
+            and abs(south) <= 90 and abs(north) <= 90
+        )
 
     def _get_selected_features_geojson(self):
         try:
@@ -249,7 +282,6 @@ class AdvancedSearchPanel(QWidget):
             crs_src = layer.crs()
             transform = QgsCoordinateTransform(crs_src, crs_dest, QgsProject.instance())
 
-            # Use the first selected feature's geometry
             geom = features[0].geometry()
             geom.transform(transform)
             return json.loads(geom.asJson())
@@ -282,6 +314,16 @@ class AdvancedSearchPanel(QWidget):
             limit=self._limit_spin.value(),
         )
         self._controller.search(params)
+
+    def _on_show_metadata(self):
+        collection_id = self._collection_combo.currentData()
+        if not collection_id:
+            return
+        for c in self._collections:
+            if c.id == collection_id:
+                dlg = CollectionMetadataDialog(c, parent=self)
+                dlg.exec_()
+                return
 
     def _on_loading_changed(self, operation, is_loading):
         if operation == "search":

@@ -17,6 +17,7 @@ from .ui.widgets.advanced_search_panel import AdvancedSearchPanel
 from .ui.widgets.results_panel import ResultsPanel
 from .ui.widgets.item_details_panel import ItemDetailsPanel
 from .ui.widgets.downloads_panel import DownloadsPanel
+from .ui.widgets.settings_panel import SettingsPanel
 
 
 class CbersExplorerPlugin:
@@ -32,7 +33,7 @@ class CbersExplorerPlugin:
         # Locale / i18n
         locale = QSettings().value("locale/userLocale", "en")[0:2]
         locale_path = os.path.join(
-            self.plugin_dir, "i18n", f"CbersExplorer_{locale}.qm"
+            self.plugin_dir, "i18n", f"cbers_explorer_{locale}.qm"
         )
         if os.path.exists(locale_path):
             self.translator = QTranslator()
@@ -114,9 +115,11 @@ class CbersExplorerPlugin:
             self._state, self._download_controller
         )
 
+        settings_panel = SettingsPanel(self._config_repo)
+
         self._panels = [
             quick_search, advanced_search, results_panel,
-            details_panel, downloads_panel,
+            details_panel, downloads_panel, settings_panel,
         ]
 
         self.dock.set_page_widget(CbersExplorerDock.PAGE_QUICK_SEARCH, quick_search)
@@ -124,6 +127,7 @@ class CbersExplorerPlugin:
         self.dock.set_page_widget(CbersExplorerDock.PAGE_RESULTS, results_panel)
         self.dock.set_page_widget(CbersExplorerDock.PAGE_DETAILS, details_panel)
         self.dock.set_page_widget(CbersExplorerDock.PAGE_DOWNLOADS, downloads_panel)
+        self.dock.set_page_widget(CbersExplorerDock.PAGE_SETTINGS, settings_panel)
 
         # Auto-navigation: search completed -> Results
         self._state.search_results_changed.connect(
@@ -146,20 +150,19 @@ class CbersExplorerPlugin:
         # Navigate to Quick Search on open
         self.dock.navigate_to(CbersExplorerDock.PAGE_QUICK_SEARCH)
 
+    RASTER_EXTENSIONS = (".tif", ".tiff", ".img", ".jp2", ".ecw", ".vrt")
+
     def _on_download_completed(self, item_id, file_path):
         self._update_downloads_badge()
-
-        # Check if downloads panel has auto_add enabled
-        downloads_panel = self._panels[4] if len(self._panels) > 4 else None
-        auto_add = (
-            downloads_panel.auto_add_on_download
-            if downloads_panel
-            else self._config_repo.get("auto_add_on_download")
-        )
-        if auto_add:
+        if not self._config_repo.get("auto_add_on_download"):
+            return
+        ext = os.path.splitext(file_path)[1].lower()
+        if ext in self.RASTER_EXTENSIONS:
             self._layer_controller.add_downloaded_to_map(file_path, item_id)
 
     def _update_downloads_badge(self):
+        if not self.dock:
+            return
         active = len(self._download_controller.active_downloads)
         btn = self.dock.activity_bar.button_at(CbersExplorerDock.PAGE_DOWNLOADS)
         if btn:

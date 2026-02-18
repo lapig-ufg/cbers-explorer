@@ -9,7 +9,10 @@ from qgis.PyQt.QtNetwork import QNetworkRequest
 from qgis.core import QgsNetworkAccessManager
 from qgis.utils import iface
 
-from ..theme import SEARCH_BUTTON_STYLESHEET, PRESET_BUTTON_STYLESHEET
+from ..theme import (
+    SEARCH_BUTTON_STYLESHEET, PRESET_BUTTON_STYLESHEET,
+    TITLE_STYLESHEET, THUMBNAIL_STYLESHEET,
+)
 
 
 class ItemDetailsPanel(QWidget):
@@ -33,7 +36,7 @@ class ItemDetailsPanel(QWidget):
 
         # Title
         self._title_label = QLabel(self.tr("Detalhes"))
-        self._title_label.setStyleSheet("font-size: 14px; font-weight: bold; color: #2c3e50;")
+        self._title_label.setStyleSheet(TITLE_STYLESHEET)
         layout.addWidget(self._title_label)
 
         # Scroll area for content
@@ -50,9 +53,7 @@ class ItemDetailsPanel(QWidget):
         self._thumbnail_label = QLabel()
         self._thumbnail_label.setAlignment(Qt.AlignCenter)
         self._thumbnail_label.setFixedHeight(180)
-        self._thumbnail_label.setStyleSheet(
-            "background-color: #f8f9fa; border-radius: 4px;"
-        )
+        self._thumbnail_label.setStyleSheet(THUMBNAIL_STYLESHEET)
         self._thumbnail_label.setText(self.tr("Sem thumbnail"))
         self._content_layout.addWidget(self._thumbnail_label)
 
@@ -85,14 +86,16 @@ class ItemDetailsPanel(QWidget):
         self._content_layout.addWidget(assets_label)
 
         self._assets_table = QTableWidget()
-        self._assets_table.setColumnCount(4)
+        self._assets_table.setColumnCount(5)
         self._assets_table.setHorizontalHeaderLabels([
-            self.tr("Key"), self.tr("Tipo"), self.tr("COG"), self.tr("Acao"),
+            self.tr("Key"), self.tr("Tipo"), self.tr("COG"),
+            self.tr("Mapa"), self.tr("Download"),
         ])
         self._assets_table.horizontalHeader().setSectionResizeMode(0, QHeaderView.Stretch)
         self._assets_table.horizontalHeader().setSectionResizeMode(1, QHeaderView.ResizeToContents)
         self._assets_table.horizontalHeader().setSectionResizeMode(2, QHeaderView.ResizeToContents)
         self._assets_table.horizontalHeader().setSectionResizeMode(3, QHeaderView.ResizeToContents)
+        self._assets_table.horizontalHeader().setSectionResizeMode(4, QHeaderView.ResizeToContents)
         self._assets_table.verticalHeader().setVisible(False)
         self._assets_table.setMaximumHeight(200)
         self._content_layout.addWidget(self._assets_table)
@@ -184,14 +187,23 @@ class ItemDetailsPanel(QWidget):
                 self.tr("Sim") if asset.is_cog else self.tr("Nao")
             ))
 
+            # + Mapa: COG only
             add_btn = QPushButton(self.tr("+ Mapa"))
             add_btn.setStyleSheet(PRESET_BUTTON_STYLESHEET)
             add_btn.clicked.connect(
                 lambda _, k=key: self._on_add_asset_to_map(k)
             )
-            if not asset.is_cog:
-                add_btn.setEnabled(False)
+            add_btn.setEnabled(asset.is_cog)
             self._assets_table.setCellWidget(row, 3, add_btn)
+
+            # Download: any asset with href
+            dl_btn = QPushButton(self.tr("Baixar"))
+            dl_btn.setStyleSheet(PRESET_BUTTON_STYLESHEET)
+            dl_btn.clicked.connect(
+                lambda _, k=key: self._on_download_asset(k)
+            )
+            dl_btn.setEnabled(asset.is_downloadable)
+            self._assets_table.setCellWidget(row, 4, dl_btn)
 
     def _load_thumbnail(self, item):
         url = item.thumbnail_url
@@ -254,10 +266,23 @@ class ItemDetailsPanel(QWidget):
                 f"{self._current_item.id}_{asset_key}", asset.href
             )
 
+    def _on_download_asset(self, asset_key):
+        if not self._current_item:
+            return
+        asset = self._current_item.assets.get(asset_key)
+        if asset and asset.is_downloadable:
+            self._download_controller.download_asset(self._current_item, asset)
+            iface.messageBar().pushInfo(
+                "CBERS Explorer",
+                self.tr("Download iniciado: {item_id}").format(
+                    item_id=self._current_item.id
+                ),
+            )
+
     def _on_download(self):
         if not self._current_item:
             return
-        asset = self._current_item.preferred_asset()
+        asset = self._current_item.first_downloadable_asset()
         if asset:
             self._download_controller.download_asset(self._current_item, asset)
             iface.messageBar().pushInfo(

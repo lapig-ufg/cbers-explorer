@@ -6,12 +6,20 @@ from qgis.PyQt.QtWidgets import (
 )
 from qgis.utils import iface
 
-from ..theme import TABLE_STYLESHEET, PRESET_BUTTON_STYLESHEET
+from ..theme import (
+    TABLE_STYLESHEET, PRESET_BUTTON_STYLESHEET,
+    TITLE_STYLESHEET, DESC_STYLESHEET,
+)
+from .item_metadata_dialog import ItemMetadataDialog
 
 
 class StacItemTableModel(QAbstractTableModel):
 
-    COLUMNS = ["ID", "Data", "Cloud Cover", "Assets"]
+    COL_ID = 0
+    COL_DATE = 1
+    COL_ACTIONS = 2
+
+    COLUMNS = ["ID", "Data", ""]
 
     def __init__(self, parent=None):
         super().__init__(parent)
@@ -36,23 +44,18 @@ class StacItemTableModel(QAbstractTableModel):
         col = index.column()
 
         if role == Qt.DisplayRole:
-            if col == 0:
+            if col == self.COL_ID:
                 return item.id
-            elif col == 1:
+            elif col == self.COL_DATE:
                 dt = item.datetime
                 if dt and len(dt) >= 10:
                     return dt[:10]
                 return dt or ""
-            elif col == 2:
-                cc = item.cloud_cover
-                return f"{cc:.1f}%" if cc is not None else "N/A"
-            elif col == 3:
-                return f"{len(item.cog_assets)} COG"
 
         if role == Qt.UserRole:
             return item
 
-        if role == Qt.ToolTipRole and col == 0:
+        if role == Qt.ToolTipRole and col == self.COL_ID:
             return item.id
 
         return None
@@ -91,11 +94,11 @@ class ResultsPanel(QWidget):
         # Header
         header_layout = QHBoxLayout()
         self._title_label = QLabel(self.tr("Resultados"))
-        self._title_label.setStyleSheet("font-size: 14px; font-weight: bold; color: #2c3e50;")
+        self._title_label.setStyleSheet(TITLE_STYLESHEET)
         header_layout.addWidget(self._title_label)
         header_layout.addStretch()
         self._count_label = QLabel("")
-        self._count_label.setStyleSheet("color: #7f8c8d; font-size: 11px;")
+        self._count_label.setStyleSheet(DESC_STYLESHEET)
         header_layout.addWidget(self._count_label)
         layout.addLayout(header_layout)
 
@@ -108,8 +111,15 @@ class ResultsPanel(QWidget):
         self._table.setSelectionMode(QAbstractItemView.SingleSelection)
         self._table.setAlternatingRowColors(True)
         self._table.verticalHeader().setVisible(False)
-        self._table.horizontalHeader().setStretchLastSection(True)
-        self._table.horizontalHeader().setSectionResizeMode(0, QHeaderView.Stretch)
+        self._table.horizontalHeader().setSectionResizeMode(
+            StacItemTableModel.COL_ID, QHeaderView.Stretch
+        )
+        self._table.horizontalHeader().setSectionResizeMode(
+            StacItemTableModel.COL_DATE, QHeaderView.ResizeToContents
+        )
+        self._table.horizontalHeader().setSectionResizeMode(
+            StacItemTableModel.COL_ACTIONS, QHeaderView.ResizeToContents
+        )
         self._table.doubleClicked.connect(self._on_row_double_clicked)
         self._table.clicked.connect(self._on_row_clicked)
         layout.addWidget(self._table)
@@ -142,7 +152,6 @@ class ResultsPanel(QWidget):
 
         self._page_label = QLabel("")
         self._page_label.setAlignment(Qt.AlignCenter)
-        self._page_label.setStyleSheet("font-size: 11px;")
         pag_layout.addWidget(self._page_label)
 
         self._next_btn = QPushButton(">")
@@ -155,7 +164,7 @@ class ResultsPanel(QWidget):
         pag_layout.addStretch()
 
         self._total_label = QLabel("")
-        self._total_label.setStyleSheet("color: #7f8c8d; font-size: 11px;")
+        self._total_label.setStyleSheet(DESC_STYLESHEET)
         pag_layout.addWidget(self._total_label)
         layout.addLayout(pag_layout)
 
@@ -167,9 +176,63 @@ class ResultsPanel(QWidget):
         if not result:
             return
         self._model.set_items(result.items)
+        self._populate_action_buttons(result.items)
         self._update_pagination(result)
         self._add_map_btn.setEnabled(False)
         self._copy_url_btn.setEnabled(False)
+
+    def _populate_action_buttons(self, items):
+        preferred = self._config.get("preferred_asset")
+        for row, item in enumerate(items):
+            actions_idx = self._model.index(row, StacItemTableModel.COL_ACTIONS)
+
+            container = QWidget()
+            h_layout = QHBoxLayout(container)
+            h_layout.setContentsMargins(2, 0, 2, 0)
+            h_layout.setSpacing(4)
+
+            # + Mapa button
+            asset = item.preferred_asset(preferred)
+            map_btn = QPushButton(self.tr("+ Mapa"))
+            map_btn.setStyleSheet(PRESET_BUTTON_STYLESHEET)
+            if asset:
+                map_btn.clicked.connect(
+                    lambda _, r=row: self._on_add_row_to_map(r)
+                )
+            else:
+                map_btn.setEnabled(False)
+                map_btn.setToolTip(
+                    self.tr("Nenhum asset COG disponivel para este item.")
+                )
+            h_layout.addWidget(map_btn)
+
+            # Info button
+            info_btn = QPushButton(self.tr("Info"))
+            info_btn.setStyleSheet(PRESET_BUTTON_STYLESHEET)
+            info_btn.setToolTip(
+                self.tr("Ver metadados completos do item")
+            )
+            info_btn.clicked.connect(
+                lambda _, r=row: self._on_show_item_metadata(r)
+            )
+            h_layout.addWidget(info_btn)
+
+            self._table.setIndexWidget(actions_idx, container)
+
+    def _on_show_item_metadata(self, row):
+        item = self._model.item_at(row)
+        if item:
+            dlg = ItemMetadataDialog(item, parent=self)
+            dlg.exec_()
+
+    def _on_add_row_to_map(self, row):
+        item = self._model.item_at(row)
+        if not item:
+            return
+        preferred = self._config.get("preferred_asset")
+        asset = item.preferred_asset(preferred)
+        if asset:
+            self._layer_controller.add_cog_to_map(item.id, asset.href)
 
     def _update_pagination(self, result):
         params = self._state.current_search_params

@@ -1,4 +1,5 @@
 from qgis.PyQt.QtCore import pyqtSignal, Qt
+from qgis.PyQt.QtGui import QFont
 from qgis.PyQt.QtWidgets import (
     QDockWidget, QWidget, QHBoxLayout, QVBoxLayout,
     QStackedWidget, QLabel, QSizePolicy,
@@ -17,6 +18,7 @@ class CbersExplorerDock(QDockWidget):
     PAGE_RESULTS = 2
     PAGE_DETAILS = 3
     PAGE_DOWNLOADS = 4
+    PAGE_SETTINGS = 5
 
     def __init__(self, state, parent=None):
         super().__init__(parent)
@@ -24,6 +26,11 @@ class CbersExplorerDock(QDockWidget):
         self.setWindowTitle(f"CBERS Explorer v{PLUGIN_VERSION}")
         self.setStyleSheet(DOCK_STYLESHEET)
         self.setMinimumWidth(380)
+
+        font = QFont()
+        font.setBold(True)
+        font.setPointSize(10)
+        self.setFont(font)
 
         self._build_ui()
         self._setup_nav_buttons()
@@ -52,8 +59,8 @@ class CbersExplorerDock(QDockWidget):
         self._stack = QStackedWidget()
         content_layout.addWidget(self._stack)
 
-        # Placeholders for 5 pages
-        for i in range(5):
+        # Placeholders for 6 pages
+        for i in range(6):
             placeholder = QWidget()
             layout = QVBoxLayout(placeholder)
             label = QLabel(self.tr("Pagina {index}").format(index=i))
@@ -80,6 +87,7 @@ class CbersExplorerDock(QDockWidget):
         # Bottom group: details and downloads
         self._activity_bar.add_button("nav_details", self.tr("Detalhes"), self.PAGE_DETAILS)
         self._activity_bar.add_button("nav_downloads", self.tr("Downloads"), self.PAGE_DOWNLOADS)
+        self._activity_bar.add_button("nav_settings", self.tr("Configuracoes"), self.PAGE_SETTINGS)
 
     def set_page_widget(self, page_index, widget):
         old = self._stack.widget(page_index)

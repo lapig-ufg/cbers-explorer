@@ -10,7 +10,11 @@ from qgis.utils import iface
 
 from ...domain.models import SearchParams
 from ...infra.config.settings import DEFAULT_COLLECTION
-from ..theme import SEARCH_BUTTON_STYLESHEET, PRESET_BUTTON_STYLESHEET, SECTION_LABEL_STYLESHEET
+from ..theme import (
+    SEARCH_BUTTON_STYLESHEET, PRESET_BUTTON_STYLESHEET,
+    SECTION_LABEL_STYLESHEET, TITLE_STYLESHEET, DESC_STYLESHEET,
+    INFO_BOX_STYLESHEET, HIGHLIGHT_BOX_STYLESHEET,
+)
 
 
 class QuickSearchPanel(QWidget):
@@ -33,11 +37,11 @@ class QuickSearchPanel(QWidget):
 
         # Title
         title = QLabel(self.tr("Busca Rapida"))
-        title.setStyleSheet("font-size: 14px; font-weight: bold; color: #2c3e50;")
+        title.setStyleSheet(TITLE_STYLESHEET)
         layout.addWidget(title)
 
         desc = QLabel(self.tr("Busca por bbox do canvas com colecao fixa"))
-        desc.setStyleSheet("color: #7f8c8d; font-size: 11px;")
+        desc.setStyleSheet(DESC_STYLESHEET)
         desc.setWordWrap(True)
         layout.addWidget(desc)
 
@@ -54,9 +58,7 @@ class QuickSearchPanel(QWidget):
 
         self._bbox_display = QLabel(self.tr("Nao definido"))
         self._bbox_display.setWordWrap(True)
-        self._bbox_display.setStyleSheet(
-            "background-color: #f8f9fa; padding: 6px; border-radius: 3px; font-size: 11px;"
-        )
+        self._bbox_display.setStyleSheet(INFO_BOX_STYLESHEET)
         layout.addWidget(self._bbox_display)
 
         self._update_bbox_btn = QPushButton(self.tr("Atualizar Bbox"))
@@ -104,10 +106,7 @@ class QuickSearchPanel(QWidget):
         layout.addWidget(col_label)
 
         col_value = QLabel(DEFAULT_COLLECTION)
-        col_value.setStyleSheet(
-            "background-color: #eaf2f8; padding: 6px; border-radius: 3px; "
-            "font-weight: bold; color: #2980b9;"
-        )
+        col_value.setStyleSheet(HIGHLIGHT_BOX_STYLESHEET)
         layout.addWidget(col_value)
 
         layout.addStretch()
@@ -130,21 +129,37 @@ class QuickSearchPanel(QWidget):
             crs_dest = QgsCoordinateReferenceSystem("EPSG:4326")
             crs_src = canvas.mapSettings().destinationCrs()
             transform = QgsCoordinateTransform(crs_src, crs_dest, QgsProject.instance())
-            extent_transformed = transform.transformBoundingBox(extent)
+            ext = transform.transformBoundingBox(extent)
 
-            self._current_bbox = [
-                round(extent_transformed.xMinimum(), 6),
-                round(extent_transformed.yMinimum(), 6),
-                round(extent_transformed.xMaximum(), 6),
-                round(extent_transformed.yMaximum(), 6),
+            bbox = [
+                round(ext.xMinimum(), 6),
+                round(ext.yMinimum(), 6),
+                round(ext.xMaximum(), 6),
+                round(ext.yMaximum(), 6),
             ]
+
+            if not self._is_valid_wgs84_bbox(bbox):
+                self._current_bbox = None
+                self._bbox_display.setText(self.tr("Nao definido"))
+                return
+
+            self._current_bbox = bbox
             self._bbox_display.setText(
-                f"[{self._current_bbox[0]}, {self._current_bbox[1]}, "
-                f"{self._current_bbox[2]}, {self._current_bbox[3]}]"
+                f"[{bbox[0]}, {bbox[1]}, {bbox[2]}, {bbox[3]}]"
             )
         except Exception:
             self._current_bbox = None
             self._bbox_display.setText(self.tr("Erro ao obter bbox do canvas"))
+
+    @staticmethod
+    def _is_valid_wgs84_bbox(bbox):
+        if not bbox or len(bbox) != 4:
+            return False
+        west, south, east, north = bbox
+        return (
+            abs(west) <= 180 and abs(east) <= 180
+            and abs(south) <= 90 and abs(north) <= 90
+        )
 
     def _apply_preset(self, days):
         self._end_date.setDate(QDate.currentDate())
