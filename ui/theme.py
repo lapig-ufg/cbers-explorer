@@ -16,7 +16,7 @@ QDockWidget {
 
 QDockWidget::title {
     background-color: palette(highlight);
-    color: palette(highlighted-text);
+    color: white;
     padding: 8px;
     font-size: 13px;
     font-weight: bold;

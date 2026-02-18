@@ -25,7 +25,7 @@ class CbersExplorerDock(QDockWidget):
         self._state = state
         self.setWindowTitle(f"CBERS Explorer v{PLUGIN_VERSION}")
         self.setStyleSheet(DOCK_STYLESHEET)
-        self.setMinimumWidth(380)
+        self.setMinimumWidth(280)
 
         font = QFont()
         font.setBold(True)
