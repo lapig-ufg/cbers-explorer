@@ -25,11 +25,7 @@ class DownloadController(QObject):
         if not dest_dir:
             dest_dir = os.path.expanduser("~")
 
-        ext = ".tif"
-        if "png" in asset.media_type.lower():
-            ext = ".png"
-        elif "jpeg" in asset.media_type.lower() or "jpg" in asset.media_type.lower():
-            ext = ".jpg"
+        ext = self._resolve_extension(asset)
 
         filename = f"{item.id}_{asset.key}{ext}"
         dest_path = os.path.join(dest_dir, filename)
@@ -53,7 +49,7 @@ class DownloadController(QObject):
             task.cancel()
 
     def cancel_all(self):
-        for task in self._active_tasks.values():
+        for task in list(self._active_tasks.values()):
             task.cancel()
 
     def _on_progress(self, item_id, percent):
@@ -62,6 +58,25 @@ class DownloadController(QObject):
     def _on_file_ready(self, file_path, item_id):
         self._active_tasks.pop(item_id, None)
         self._state.download_completed.emit(item_id, file_path)
+
+    @staticmethod
+    def _resolve_extension(asset):
+        mt = asset.media_type.lower()
+        if "png" in mt:
+            return ".png"
+        if "jpeg" in mt or "jpg" in mt:
+            return ".jpg"
+        if "json" in mt or "geojson" in mt:
+            return ".json"
+        if "xml" in mt:
+            return ".xml"
+        if "tiff" in mt or "geotiff" in mt:
+            return ".tif"
+        # Fallback: try to extract from href
+        href = asset.href.split("?")[0]
+        if "." in href.split("/")[-1]:
+            return "." + href.split("/")[-1].rsplit(".", 1)[-1]
+        return ".tif"
 
     def _on_completed(self, item_id, success, message):
         if not success:

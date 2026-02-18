@@ -17,6 +17,8 @@ class DownloadTask(CbersTask):
         self._dest_path = dest_path
         self._item_id = item_id
 
+    MIN_VALID_SIZE = 1024  # bytes — any real asset is larger than 1KB
+
     def run(self):
         try:
             self.signals.status_message.emit(f"Baixando {self._item_id}...")
@@ -40,6 +42,23 @@ class DownloadTask(CbersTask):
 
             reply = blocker.reply()
             content = bytes(reply.content())
+
+            # Validate: reject empty or suspiciously small responses
+            if len(content) < self.MIN_VALID_SIZE:
+                self._exception = Exception(
+                    f"Conteudo invalido ({len(content)} bytes)"
+                )
+                return False
+
+            # Validate: detect HTML error pages saved as binary files
+            header = content[:512].lstrip()
+            if header[:1] in (b"<",) and (
+                b"<html" in header.lower() or b"<!doctype" in header.lower()
+            ):
+                self._exception = Exception(
+                    "Servidor retornou pagina HTML em vez do arquivo"
+                )
+                return False
 
             with open(self._dest_path, "wb") as f:
                 f.write(content)

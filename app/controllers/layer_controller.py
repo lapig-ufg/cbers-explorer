@@ -54,6 +54,13 @@ class LayerController(QObject):
             return None
 
     def add_downloaded_to_map(self, file_path, layer_name):
+        import os
+        if not os.path.isfile(file_path) or os.path.getsize(file_path) < 1024:
+            self._iface.messageBar().pushWarning(
+                "CBERS Explorer",
+                self.tr("Falha ao carregar arquivo: {name}").format(name=layer_name),
+            )
+            return None
         layer = QgsRasterLayer(file_path, layer_name, "gdal")
         if layer.isValid():
             QgsProject.instance().addMapLayer(layer)
