@@ -96,7 +96,6 @@ class DownloadsPanel(QWidget):
         if isinstance(progress, QProgressBar):
             progress.setValue(100)
         self._table.setItem(row, 2, QTableWidgetItem(self.tr("Concluido")))
-        self._update_empty_state()
 
     def _on_download_failed(self, item_id, error):
         row = self._rows.get(item_id)
@@ -105,7 +104,6 @@ class DownloadsPanel(QWidget):
         self._table.setItem(
             row, 2, QTableWidgetItem(self.tr("Erro: {msg}").format(msg=error[:30]))
         )
-        self._update_empty_state()
 
     def _on_cancel_all(self):
         self._download_controller.cancel_all()
