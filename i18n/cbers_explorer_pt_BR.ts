@@ -291,7 +291,7 @@
         <translation></translation>
     </message>
     <message>
-        <source>Acoes</source>
+        <source>Ações</source>
         <translation></translation>
     </message>
 </context>

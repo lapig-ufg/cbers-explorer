@@ -22,9 +22,8 @@ class StacItemTableModel(QAbstractTableModel):
     def __init__(self, parent=None):
         super().__init__(parent)
         self._items = []
-        self._columns = [
-            self.tr("ID"), self.tr("Data"), self.tr("Acoes")
-        ]
+        tr = lambda msg: QCoreApplication.translate("ResultsPanel", msg)
+        self._columns = [tr("ID"), tr("Data"), tr("Ações")]
 
     def set_items(self, items):
         self.beginResetModel()
