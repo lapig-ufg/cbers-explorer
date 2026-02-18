@@ -42,7 +42,7 @@ EXTRA_DIRS = \
 	ui \
 	assets
 
-EXTRAS = metadata.txt icon.png
+EXTRAS = metadata.txt icon.png LICENSE
 
 COMPILED_RESOURCE_FILES = resources.py
 
