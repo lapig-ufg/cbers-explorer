@@ -196,6 +196,10 @@
         <source>Ver metadados da colecao</source>
         <translation></translation>
     </message>
+    <message>
+        <source>Filtrar colecao...</source>
+        <translation></translation>
+    </message>
 </context>
 <context>
     <name>CollectionMetadataDialog</name>

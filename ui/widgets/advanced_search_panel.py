@@ -4,7 +4,7 @@ from qgis.PyQt.QtCore import Qt, QDate
 from qgis.PyQt.QtWidgets import (
     QWidget, QVBoxLayout, QHBoxLayout, QLabel,
     QPushButton, QDateEdit, QComboBox, QSpinBox,
-    QFrame, QGroupBox,
+    QFrame, QGroupBox, QCompleter,
 )
 from qgis.core import (
     QgsCoordinateReferenceSystem, QgsCoordinateTransform, QgsProject,
@@ -124,7 +124,12 @@ class AdvancedSearchPanel(QWidget):
 
         col_row = QHBoxLayout()
         self._collection_combo = QComboBox()
+        self._collection_combo.setEditable(True)
+        self._collection_combo.setInsertPolicy(QComboBox.NoInsert)
         self._collection_combo.setMinimumHeight(28)
+        self._collection_combo.lineEdit().setPlaceholderText(
+            self.tr("Filtrar colecao...")
+        )
         col_row.addWidget(self._collection_combo)
 
         self._metadata_btn = QPushButton(self.tr("Info"))
@@ -169,6 +174,11 @@ class AdvancedSearchPanel(QWidget):
         for c in collections:
             display = c.title if c.title else c.id
             self._collection_combo.addItem(display, c.id)
+
+        completer = self._collection_combo.completer()
+        if completer:
+            completer.setCompletionMode(QCompleter.PopupCompletion)
+            completer.setFilterMode(Qt.MatchContains)
 
         self._metadata_btn.setEnabled(len(collections) > 0)
 
