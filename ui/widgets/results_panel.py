@@ -19,11 +19,12 @@ class StacItemTableModel(QAbstractTableModel):
     COL_DATE = 1
     COL_ACTIONS = 2
 
-    COLUMNS = ["ID", "Data", ""]
-
     def __init__(self, parent=None):
         super().__init__(parent)
         self._items = []
+        self._columns = [
+            self.tr("ID"), self.tr("Data"), self.tr("Acoes")
+        ]
 
     def set_items(self, items):
         self.beginResetModel()
@@ -34,7 +35,7 @@ class StacItemTableModel(QAbstractTableModel):
         return len(self._items)
 
     def columnCount(self, parent=QModelIndex()):
-        return len(self.COLUMNS)
+        return len(self._columns)
 
     def data(self, index, role=Qt.DisplayRole):
         if not index.isValid() or index.row() >= len(self._items):
@@ -62,8 +63,8 @@ class StacItemTableModel(QAbstractTableModel):
 
     def headerData(self, section, orientation, role=Qt.DisplayRole):
         if role == Qt.DisplayRole and orientation == Qt.Horizontal:
-            if section < len(self.COLUMNS):
-                return self.COLUMNS[section]
+            if section < len(self._columns):
+                return self._columns[section]
         return None
 
     def item_at(self, row):
@@ -118,7 +119,10 @@ class ResultsPanel(QWidget):
             StacItemTableModel.COL_DATE, QHeaderView.ResizeToContents
         )
         self._table.horizontalHeader().setSectionResizeMode(
-            StacItemTableModel.COL_ACTIONS, QHeaderView.ResizeToContents
+            StacItemTableModel.COL_ACTIONS, QHeaderView.Fixed
+        )
+        self._table.horizontalHeader().resizeSection(
+            StacItemTableModel.COL_ACTIONS, 150
         )
         self._table.doubleClicked.connect(self._on_row_double_clicked)
         self._table.clicked.connect(self._on_row_clicked)
@@ -193,7 +197,7 @@ class ResultsPanel(QWidget):
 
             # + Mapa button
             asset = item.preferred_asset(preferred)
-            map_btn = QPushButton(self.tr("+ Mapa"))
+            map_btn = QPushButton(self.tr("Add"))
             map_btn.setStyleSheet(PRESET_BUTTON_STYLESHEET)
             if asset:
                 map_btn.clicked.connect(
