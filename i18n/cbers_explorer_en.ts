@@ -38,6 +38,10 @@
         <source>Downloads</source>
         <translation>Downloads</translation>
     </message>
+    <message>
+        <source>Configuracoes</source>
+        <translation>Settings</translation>
+    </message>
 </context>
 <context>
     <name>QuickSearchPanel</name>
@@ -184,6 +188,49 @@
         <source>Nenhuma feicao selecionada</source>
         <translation>No features selected</translation>
     </message>
+    <message>
+        <source>Info</source>
+        <translation>Info</translation>
+    </message>
+    <message>
+        <source>Ver metadados da colecao</source>
+        <translation>View collection metadata</translation>
+    </message>
+</context>
+<context>
+    <name>CollectionMetadataDialog</name>
+    <message>
+        <source>Metadados da Colecao: {id}</source>
+        <translation>Collection Metadata: {id}</translation>
+    </message>
+    <message>
+        <source>Propriedade</source>
+        <translation>Property</translation>
+    </message>
+    <message>
+        <source>Valor</source>
+        <translation>Value</translation>
+    </message>
+    <message>
+        <source>[{n} itens]</source>
+        <translation>[{n} items]</translation>
+    </message>
+    <message>
+        <source>PROPRIEDADES</source>
+        <translation>PROPERTIES</translation>
+    </message>
+    <message>
+        <source>presente</source>
+        <translation>present</translation>
+    </message>
+    <message>
+        <source>Copiar JSON</source>
+        <translation>Copy JSON</translation>
+    </message>
+    <message>
+        <source>Fechar</source>
+        <translation>Close</translation>
+    </message>
 </context>
 <context>
     <name>ResultsPanel</name>
@@ -222,6 +269,49 @@
     <message>
         <source>Resultados (buscando...)</source>
         <translation>Results (searching...)</translation>
+    </message>
+    <message>
+        <source>+ Mapa</source>
+        <translation>+ Map</translation>
+    </message>
+    <message>
+        <source>Info</source>
+        <translation>Info</translation>
+    </message>
+    <message>
+        <source>Ver metadados completos do item</source>
+        <translation>View full item metadata</translation>
+    </message>
+</context>
+<context>
+    <name>ItemMetadataDialog</name>
+    <message>
+        <source>Metadados do Item: {id}</source>
+        <translation>Item Metadata: {id}</translation>
+    </message>
+    <message>
+        <source>PROPRIEDADES</source>
+        <translation>PROPERTIES</translation>
+    </message>
+    <message>
+        <source>Propriedade</source>
+        <translation>Property</translation>
+    </message>
+    <message>
+        <source>Valor</source>
+        <translation>Value</translation>
+    </message>
+    <message>
+        <source>[{n} itens]</source>
+        <translation>[{n} items]</translation>
+    </message>
+    <message>
+        <source>Copiar JSON</source>
+        <translation>Copy JSON</translation>
+    </message>
+    <message>
+        <source>Fechar</source>
+        <translation>Close</translation>
     </message>
 </context>
 <context>
@@ -271,8 +361,12 @@
         <translation>COG</translation>
     </message>
     <message>
-        <source>Acao</source>
-        <translation>Action</translation>
+        <source>Mapa</source>
+        <translation>Map</translation>
+    </message>
+    <message>
+        <source>Baixar</source>
+        <translation>Download</translation>
     </message>
     <message>
         <source>Adicionar ao Mapa</source>
@@ -358,10 +452,6 @@
         <translation>Status</translation>
     </message>
     <message>
-        <source>Adicionar ao mapa ao concluir</source>
-        <translation>Add to map when completed</translation>
-    </message>
-    <message>
         <source>Nenhum download em andamento</source>
         <translation>No downloads in progress</translation>
     </message>
@@ -403,6 +493,73 @@
     <message>
         <source>Falha ao carregar arquivo: {name}</source>
         <translation>Failed to load file: {name}</translation>
+    </message>
+</context>
+<context>
+    <name>SettingsPanel</name>
+    <message>
+        <source>Configuracoes</source>
+        <translation>Settings</translation>
+    </message>
+    <message>
+        <source>Configuracao do plugin</source>
+        <translation>Plugin configuration</translation>
+    </message>
+    <message>
+        <source>WORKSPACE</source>
+        <translation>WORKSPACE</translation>
+    </message>
+    <message>
+        <source>Diretorio de downloads</source>
+        <translation>Downloads directory</translation>
+    </message>
+    <message>
+        <source>Procurar...</source>
+        <translation>Browse...</translation>
+    </message>
+    <message>
+        <source>STAC API</source>
+        <translation>STAC API</translation>
+    </message>
+    <message>
+        <source>BUSCA</source>
+        <translation>SEARCH</translation>
+    </message>
+    <message>
+        <source>Itens por pagina:</source>
+        <translation>Items per page:</translation>
+    </message>
+    <message>
+        <source>Asset preferido:</source>
+        <translation>Preferred asset:</translation>
+    </message>
+    <message>
+        <source>ex: tci, BAND15</source>
+        <translation>e.g.: tci, BAND15</translation>
+    </message>
+    <message>
+        <source>DOWNLOADS</source>
+        <translation>DOWNLOADS</translation>
+    </message>
+    <message>
+        <source>Adicionar ao mapa ao concluir download</source>
+        <translation>Auto-add to map on download</translation>
+    </message>
+    <message>
+        <source>Salvar</source>
+        <translation>Save</translation>
+    </message>
+    <message>
+        <source>Restaurar Padroes</source>
+        <translation>Restore Defaults</translation>
+    </message>
+    <message>
+        <source>Configuracoes salvas com sucesso.</source>
+        <translation>Settings saved successfully.</translation>
+    </message>
+    <message>
+        <source>Selecionar diretorio de workspace</source>
+        <translation>Select workspace directory</translation>
     </message>
 </context>
 <context>

@@ -38,6 +38,10 @@
         <source>Downloads</source>
         <translation></translation>
     </message>
+    <message>
+        <source>Configuracoes</source>
+        <translation></translation>
+    </message>
 </context>
 <context>
     <name>QuickSearchPanel</name>
@@ -184,6 +188,49 @@
         <source>Nenhuma feicao selecionada</source>
         <translation></translation>
     </message>
+    <message>
+        <source>Info</source>
+        <translation></translation>
+    </message>
+    <message>
+        <source>Ver metadados da colecao</source>
+        <translation></translation>
+    </message>
+</context>
+<context>
+    <name>CollectionMetadataDialog</name>
+    <message>
+        <source>Metadados da Colecao: {id}</source>
+        <translation></translation>
+    </message>
+    <message>
+        <source>Propriedade</source>
+        <translation></translation>
+    </message>
+    <message>
+        <source>Valor</source>
+        <translation></translation>
+    </message>
+    <message>
+        <source>[{n} itens]</source>
+        <translation></translation>
+    </message>
+    <message>
+        <source>PROPRIEDADES</source>
+        <translation></translation>
+    </message>
+    <message>
+        <source>presente</source>
+        <translation></translation>
+    </message>
+    <message>
+        <source>Copiar JSON</source>
+        <translation></translation>
+    </message>
+    <message>
+        <source>Fechar</source>
+        <translation></translation>
+    </message>
 </context>
 <context>
     <name>ResultsPanel</name>
@@ -221,6 +268,49 @@
     </message>
     <message>
         <source>Resultados (buscando...)</source>
+        <translation></translation>
+    </message>
+    <message>
+        <source>+ Mapa</source>
+        <translation></translation>
+    </message>
+    <message>
+        <source>Info</source>
+        <translation></translation>
+    </message>
+    <message>
+        <source>Ver metadados completos do item</source>
+        <translation></translation>
+    </message>
+</context>
+<context>
+    <name>ItemMetadataDialog</name>
+    <message>
+        <source>Metadados do Item: {id}</source>
+        <translation></translation>
+    </message>
+    <message>
+        <source>PROPRIEDADES</source>
+        <translation></translation>
+    </message>
+    <message>
+        <source>Propriedade</source>
+        <translation></translation>
+    </message>
+    <message>
+        <source>Valor</source>
+        <translation></translation>
+    </message>
+    <message>
+        <source>[{n} itens]</source>
+        <translation></translation>
+    </message>
+    <message>
+        <source>Copiar JSON</source>
+        <translation></translation>
+    </message>
+    <message>
+        <source>Fechar</source>
         <translation></translation>
     </message>
 </context>
@@ -271,7 +361,11 @@
         <translation></translation>
     </message>
     <message>
-        <source>Acao</source>
+        <source>Mapa</source>
+        <translation></translation>
+    </message>
+    <message>
+        <source>Baixar</source>
         <translation></translation>
     </message>
     <message>
@@ -358,10 +452,6 @@
         <translation></translation>
     </message>
     <message>
-        <source>Adicionar ao mapa ao concluir</source>
-        <translation></translation>
-    </message>
-    <message>
         <source>Nenhum download em andamento</source>
         <translation></translation>
     </message>
@@ -402,6 +492,73 @@
     </message>
     <message>
         <source>Falha ao carregar arquivo: {name}</source>
+        <translation></translation>
+    </message>
+</context>
+<context>
+    <name>SettingsPanel</name>
+    <message>
+        <source>Configuracoes</source>
+        <translation></translation>
+    </message>
+    <message>
+        <source>Configuracao do plugin</source>
+        <translation></translation>
+    </message>
+    <message>
+        <source>WORKSPACE</source>
+        <translation></translation>
+    </message>
+    <message>
+        <source>Diretorio de downloads</source>
+        <translation></translation>
+    </message>
+    <message>
+        <source>Procurar...</source>
+        <translation></translation>
+    </message>
+    <message>
+        <source>STAC API</source>
+        <translation></translation>
+    </message>
+    <message>
+        <source>BUSCA</source>
+        <translation></translation>
+    </message>
+    <message>
+        <source>Itens por pagina:</source>
+        <translation></translation>
+    </message>
+    <message>
+        <source>Asset preferido:</source>
+        <translation></translation>
+    </message>
+    <message>
+        <source>ex: tci, BAND15</source>
+        <translation></translation>
+    </message>
+    <message>
+        <source>DOWNLOADS</source>
+        <translation></translation>
+    </message>
+    <message>
+        <source>Adicionar ao mapa ao concluir download</source>
+        <translation></translation>
+    </message>
+    <message>
+        <source>Salvar</source>
+        <translation></translation>
+    </message>
+    <message>
+        <source>Restaurar Padroes</source>
+        <translation></translation>
+    </message>
+    <message>
+        <source>Configuracoes salvas com sucesso.</source>
+        <translation></translation>
+    </message>
+    <message>
+        <source>Selecionar diretorio de workspace</source>
         <translation></translation>
     </message>
 </context>
