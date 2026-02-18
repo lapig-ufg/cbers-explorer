@@ -17,6 +17,10 @@ class StacAsset:
             or "geotiff" in self.media_type.lower()
         )
 
+    @property
+    def is_downloadable(self):
+        return bool(self.href)
+
     @classmethod
     def from_dict(cls, key, data):
         return cls(
@@ -38,6 +42,7 @@ class StacItem:
     properties: dict
     assets: dict
     links: list
+    raw_data: dict = field(default_factory=dict, repr=False)
 
     @property
     def cloud_cover(self):
@@ -69,6 +74,15 @@ class StacItem:
 
         return None
 
+    def first_downloadable_asset(self):
+        cog = self.preferred_asset()
+        if cog:
+            return cog
+        for asset in self.assets.values():
+            if asset.is_downloadable:
+                return asset
+        return None
+
     @classmethod
     def from_dict(cls, data):
         assets_raw = data.get("assets", {})
@@ -85,6 +99,7 @@ class StacItem:
             properties=data.get("properties", {}),
             assets=assets,
             links=data.get("links", []),
+            raw_data=data,
         )
 
 
@@ -95,6 +110,7 @@ class StacCollection:
     description: str
     spatial_extent: list
     temporal_extent: list
+    raw_data: dict = field(default_factory=dict, repr=False)
 
     @classmethod
     def from_dict(cls, data):
@@ -108,6 +124,7 @@ class StacCollection:
             description=data.get("description", ""),
             spatial_extent=spatial,
             temporal_extent=temporal,
+            raw_data=data,
         )
 
 
