@@ -271,7 +271,7 @@
         <translation></translation>
     </message>
     <message>
-        <source>+ Mapa</source>
+        <source>Add</source>
         <translation></translation>
     </message>
     <message>
@@ -280,6 +280,18 @@
     </message>
     <message>
         <source>Ver metadados completos do item</source>
+        <translation></translation>
+    </message>
+    <message>
+        <source>ID</source>
+        <translation></translation>
+    </message>
+    <message>
+        <source>Data</source>
+        <translation></translation>
+    </message>
+    <message>
+        <source>Acoes</source>
         <translation></translation>
     </message>
 </context>

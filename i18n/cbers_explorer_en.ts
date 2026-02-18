@@ -271,8 +271,8 @@
         <translation>Results (searching...)</translation>
     </message>
     <message>
-        <source>+ Mapa</source>
-        <translation>+ Map</translation>
+        <source>Add</source>
+        <translation>Add</translation>
     </message>
     <message>
         <source>Info</source>
@@ -281,6 +281,18 @@
     <message>
         <source>Ver metadados completos do item</source>
         <translation>View full item metadata</translation>
+    </message>
+    <message>
+        <source>ID</source>
+        <translation>ID</translation>
+    </message>
+    <message>
+        <source>Data</source>
+        <translation>Date</translation>
+    </message>
+    <message>
+        <source>Acoes</source>
+        <translation>Actions</translation>
     </message>
 </context>
 <context>
